@@ -1,0 +1,13 @@
+services:
+  scraper-yahoo-finance:
+    build:
+      dockerfile_inline: |
+        FROM python:3.12
+        RUN pip3 install requests~=2.32.3 requests-ratelimiter~=0.7.0 yfinance~=0.2.56
+        WORKDIR /usr/local/src/scraper
+        COPY scraper-yahoo-finance.py ./scraper.py
+        CMD /usr/local/src/scraper/scraper.py
+    volumes:
+      - ./data/yahoo-finance:/usr/local/share/scraper/data
+    environment:
+      - TICKERS=${TICKERS}
