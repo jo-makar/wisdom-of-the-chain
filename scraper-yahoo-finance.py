@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Scrape option chain data from Yahoo Finance
 
 from requests_ratelimiter import LimiterSession
 import yfinance
