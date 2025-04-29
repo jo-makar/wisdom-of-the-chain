@@ -1,6 +1,7 @@
 .env
 mail.json
 
+data/
 scraper.log
 
-venv
+venv/

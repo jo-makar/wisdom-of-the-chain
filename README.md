@@ -9,5 +9,5 @@ Scrape the option chain data:
   - Tickers may be specified via an .env file or directly on the command line (`-e TICKERS=...`)
 - With an post-execution email of the container logs
 ```
-0 18 * * 1-5 cd ~/projects/wisdom-of-the-chain; timeout 5h docker compose run --build run scraper-yahoo-finance 2>&1 | tee scraper.log; [ -f mail.json ] && ./mail.py <scraper.log
+0 18 * * 1-5 cd ~/projects/wisdom-of-the-chain; timeout 5h docker compose run --build scraper-yahoo-finance 2>&1 | tee scraper.log; [ -f mail.json ] && ./mail.py <scraper.log
 ```
