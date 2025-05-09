@@ -5,7 +5,7 @@
 Scrape the option chain data:
 - To be run every market day (via the crontab schedule: `0 18 * * 1-5`)
   - With the hour chosen to be sufficiently after market close (dependent on timezone)
-- With a timeout of five hours (via the command `timeout 5h`); each ticker typically takes three minutes to download
+- With a timeout of five hours (via the command `timeout 5h`); each Yahoo Finance ticker typically takes two to three minutes to download when rate-limited
   - Tickers may be specified via an .env file or directly on the command line (`-e TICKERS=...`)
 - With an post-execution email of the container logs
 ```

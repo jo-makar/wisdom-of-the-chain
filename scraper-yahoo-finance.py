@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # Scrape option chain data from Yahoo Finance
 
-from requests_ratelimiter import LimiterSession
 import yfinance
 
 import datetime
@@ -13,11 +12,15 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(levelname)s:%(file
 
 data_path = os.environ.get('DATA_PATH', '/usr/local/share/scraper/data')
 
-# Maximum two requests per five seconds, ref: https://yfinance-python.org/advanced/caching.html
-session = LimiterSession(per_second=2/5.0)
+# TODO How to limit the underlying request rate?  Formerly used requests-ratelimiter:
+#        # Maximum two requests per five seconds, ref: https://yfinance-python.org/advanced/caching.html
+#        from requests_ratelimiter import LimiterSession
+#        session = LimiterSession(per_second=2/5.0)
+#        ...
+#        ticker = yfinance.Ticker(ticker, session=session)
 
 for ticker in os.environ.get('TICKERS', '').split(','):
-    ticker = yfinance.Ticker(ticker, session=session)
+    ticker = yfinance.Ticker(ticker)
 
     history = ticker.history(period='1d').to_json(orient='split')
     history_date = datetime.datetime.fromtimestamp(json.loads(history)['index'][0] / 1000).date()
