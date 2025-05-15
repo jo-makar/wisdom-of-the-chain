@@ -5,7 +5,8 @@ from datetime import date, datetime
 import json
 import os
 import re
-from typing import Any, Callable, Iterator, List, Optional, TextIO, TypedDict
+import sys
+from typing import Any, Callable, Iterator, List, Optional, Set, TextIO, TypedDict
 
 # Interface classes for use with other data sources later
 
@@ -25,7 +26,10 @@ class Loader:
     def close(self, ticker: str, date: date) -> float:
         return None
 
-    def options(self, ticker: str, expiration: date, date, calls_only: bool) -> List[OptionData]:
+    def expirations(self, ticker: str, date: date) -> List[date]:
+        return None
+
+    def options(self, ticker: str, expiration: date, date: date, calls_only: bool) -> List[OptionData]:
         return None
 
 class YahooFinanceLoader(Loader):
@@ -54,13 +58,23 @@ class YahooFinanceLoader(Loader):
                 dates += [m.group(1)]
         dates.sort()
 
-        strtodate = lambda s: datetime.strptime(s, '%Y%m%d').date()
         for date in dates:
-            yield strtodate(date)
+            yield datetime.strptime(date, '%Y%m%d').date()
 
     def close(self, ticker: str, date: date) -> float:
         fileobj = self.__get_fileobj(ticker, date)
         return json.loads(fileobj.readline())['data'][0][3]
+
+    def expirations(self, ticker: str, date: date) -> List[date]:
+        fileobj = self.__get_fileobj(ticker, date)
+        fileobj.readline()
+
+        expirations: Set[str] = set()
+        for line in fileobj:
+            expirations.add(json.loads(line)['expiration'])
+
+        expirations: List[str] = sorted(list(expirations))
+        return [datetime.strptime(e, '%Y-%m-%d').date() for e in expirations]
 
     def options(self, ticker: str, expiration: date, date: date, calls_only: bool) -> List[OptionData]:
         fileobj = self.__get_fileobj(ticker, date)
@@ -116,7 +130,7 @@ class YahooFinanceLoader(Loader):
         def __del__(self):
             hits, misses = self.__stats['hits'], self.__stats['misses']
             if hits + misses > 0:
-                print(f'cache stats: hits={hits} misses={misses} ratio={hits/(hits+misses):.2f}')
+                print(f'cache stats: hits={hits} misses={misses} ratio={hits/(hits+misses):.2f}', file=sys.stderr)
 
         def __setitem__(self, key, value):
             OrderedDict.__setitem__(self, key, value)

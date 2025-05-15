@@ -5,3 +5,4 @@ data/
 scraper.log
 
 venv/
+__pycache__/
